@@ -65,12 +65,14 @@
       color: #4CAF50;
     }
 
-    /* Dropdown Content (Hidden by Default) */
+    /* Dropdown Content with Scrolling */
     .dropdown-content {
       display: none;
       position: absolute;
       background-color: #1a1a1a;
-      min-width: 220px;
+      min-width: 250px;
+      max-height: 250px; 
+      overflow-y: auto;  
       box-shadow: 0px 8px 16px rgba(0,0,0,0.4);
       z-index: 10;
       border-radius: 4px;
@@ -79,7 +81,6 @@
       padding: 8px 0;
     }
 
-    /* Dropdown Links */
     .dropdown-content a {
       color: #fff;
       padding: 10px 16px;
@@ -93,7 +94,6 @@
       color: #4CAF50;
     }
 
-    /* Show the dropdown menu on hover */
     .dropdown:hover .dropdown-content {
       display: block;
     }
@@ -109,7 +109,6 @@
       max-width: 650px;
     }
 
-    /* Sheet Music / Notation Image Styles */
     .sheet-music {
       max-width: 400px;
       width: 100%;
@@ -178,11 +177,10 @@
 </head>
 <body>
 
-  <!-- EMBEDDED NAVIGATION BAR WITH DROPDOWN -->
+  <!-- EMBEDDED NAVIGATION BAR WITH SCROLLING DROPDOWN -->
   <nav class="navbar">
     <a href="index.html">Home / Piano</a>
     
-    <!-- Song Library Dropdown Menu -->
     <div class="dropdown">
       <button class="dropbtn">Song Library ▾</button>
       <div class="dropdown-content">
@@ -191,6 +189,7 @@
         <a href="https://mikelocin29-star.github.io/My-Favortite-Things-Verse/">My Favorite Things (Verse)</a>
         <a href="https://mikelocin29-star.github.io/My-Favortite-Things-Chorus/">My Favorite Things (Chorus)</a>
         <a href="https://mikelocin29-star.github.io/Happy-Birthday-To-You/">Happy Birthday To You</a>
+        <a href="https://mikelocin29-star.github.io/If-you-re-happy-and-you-know-it/">If you're happy and you know it</a>
       </div>
     </div>
 
@@ -201,11 +200,10 @@
   <h1>Online Piano (C4 - G5)</h1>
   <p>White keys: <b>1 to =</b> | Black keys: <b>Q,W | R,T,Y | I,O | [</b> (or click with your mouse!)</p>
 
-  <!-- Sheet Music / Notation Image Element -->
   <img src="notation.png" alt="Piano Grid Notation" class="sheet-music" onerror="this.style.display='none'">
 
   <div id="piano">
-    <!-- White Keys (C4 to G5 mapped to 1 through =) -->
+    <!-- White Keys (C4 to G5) -->
     <div class="key white" data-note="C4" data-key="1">1</div>
     <div class="key white" data-note="D4" data-key="2">2</div>
     <div class="key white" data-note="E4" data-key="3">3</div>
@@ -222,19 +220,15 @@
     <!-- Black Keys -->
     <div class="key black" data-note="C#4" data-key="q" style="left: 37px;">Q</div>
     <div class="key black" data-note="D#4" data-key="w" style="left: 77px;">W</div>
-    
     <div class="key black" data-note="F#4" data-key="r" style="left: 157px;">R</div>
     <div class="key black" data-note="G#4" data-key="t" style="left: 197px;">T</div>
     <div class="key black" data-note="A#4" data-key="y" style="left: 237px;">Y</div>
-    
     <div class="key black" data-note="C#5" data-key="i" style="left: 317px;">I</div>
     <div class="key black" data-note="D#5" data-key="o" style="left: 357px;">O</div>
-    
     <div class="key black" data-note="F#5" data-key="[" style="left: 437px;">[</div>
   </div>
 
   <script>
-    // Piano audio and interaction logic using Tone.js
     const pianoSampler = new Tone.Sampler({
       urls: {
         "C4": "C4.mp3",
@@ -243,42 +237,28 @@
         "A4": "A4.mp3",
       },
       baseUrl: "https://tonejs.github.io/audio/salamander/",
-      onload: () => {
-        console.log("Piano samples loaded successfully!");
-      }
     }).toDestination();
 
     async function playNote(note, element) {
       if (Tone.context.state !== 'running') {
         await Tone.start();
       }
-      
       pianoSampler.triggerAttackRelease(note, "8n");
-
       if (element) {
         element.classList.add('active');
         setTimeout(() => element.classList.remove('active'), 150);
       }
     }
 
-    const keys = document.querySelectorAll('.key[data-note]');
-    keys.forEach(key => {
-      const note = key.dataset.note;
-      key.addEventListener('mousedown', () => playNote(note, key));
+    document.querySelectorAll('.key[data-note]').forEach(key => {
+      key.addEventListener('mousedown', () => playNote(key.dataset.note, key));
     });
 
     window.addEventListener('keydown', (e) => {
-      if (e.repeat) return; 
-
-      const targetKey = e.key.toLowerCase();
-      const keyElement = document.querySelector(`.key[data-key="${targetKey}"]`);
-
-      if (keyElement) {
-        const note = keyElement.dataset.note;
-        playNote(note, keyElement);
-      }
+      if (e.repeat) return;
+      const keyEl = document.querySelector(`.key[data-key="${e.key.toLowerCase()}"]`);
+      if (keyEl) playNote(keyEl.dataset.note, keyEl);
     });
   </script>
-
 </body>
 </html>
